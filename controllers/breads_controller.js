@@ -4,29 +4,31 @@ const Bread = JSON.parse(require('../models/bread.js'))
 // console.log(require('../models/bread.js'))
 // console.log(Bread)
 
-// INDEX
 breads.get('/', (req, res) => {
-    res.render('index',
-      {
-        breads: Bread,
-        title: 'Index Page'
-      }
-    )
+  Bread.find()
+      .then(foundBreads => {
+          res.render('index', {
+              breads: foundBreads,
+              title: 'Index Page'
+          })
+      })
 })
 
 // CREATE
 breads.post('/', (req, res) => {
-  if (!req.body.image) {
-    req.body.image = 'https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
+  if(!req.body.image) {
+      req.body.image = undefined 
   }
   if(req.body.hasGluten === 'on') {
     req.body.hasGluten = true
   } else {
     req.body.hasGluten = false
   }
-  Bread.push(req.body)
+  Bread.create(req.body)
   res.redirect('/breads')
 })
+
+
 
 // NEW
 breads.get('/new', (req, res) => {
@@ -42,16 +44,15 @@ breads.get('/:indexArray/edit', (req, res) => {
 })
 
 // SHOW
-breads.get('/:arrayIndex', (req, res) => {
-  if (Bread[req.params.arrayIndex]) {
-    res.render('show', {
-      bread: Bread[req.params.arrayIndex],
-      index: req.params.arrayIndex
-    })
-  } else {
-    res.render('404')
-  }
+breads.get('/:id', (req, res) => {
+  Bread.findById(req.params.id)
+      .then(foundBread => {
+          res.render('show', {
+              bread: foundBread
+          })
+      })
 })
+
 
 // UPDATE
 breads.put('/:arrayIndex', (req, res) => {
